@@ -7,7 +7,7 @@ from typing import Iterator, List, Literal, Union
 
 import click
 
-from .generators import ahk, keylayout, klc, web, xkb
+from .generators import ahk, keylayout, klc, web, xkb, kbd
 from .help import create_layout, user_guide
 from .layout import KeyboardLayout, load_layout
 from .server import keyboard_server
@@ -68,6 +68,11 @@ def build_all(layout: KeyboardLayout, output_dir_path: Path) -> None:
     with file_creation_context(".xkb_symbols") as xkb_custom_path:
         with xkb_custom_path.open("w", encoding="utf-8", newline="\n") as file:
             file.write(xkb.xkb_symbols(layout))
+
+    # Linux driver, terminal
+    with file_creation_context(".kbd_keymap") as kbd_path:
+        with kbd_path.open("w", encoding="utf-8", newline="\n") as file:
+            file.write(kbd.kbd_keymap(layout))
 
     # JSON data
     with file_creation_context(".json") as json_path:
@@ -147,6 +152,10 @@ def build(
         elif output_file.suffix == ".xkb_symbols":
             with output_file.open("w", encoding="utf-8", newline="\n") as file:
                 file.write(xkb.xkb_symbols(layout))
+
+        elif output_file.suffix == ".kbd_keymap":
+            with output_file.open("w", encoding="utf-8", newline="\n") as file:
+                file.write(kbd.kbd_keymap(layout))
 
         elif output_file.suffix == ".json":
             output_file.write_text(web.pretty_json(layout), encoding="utf8")
